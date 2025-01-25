@@ -14,7 +14,8 @@ return new class extends Migration
     {
         Schema::create('dictionary', function (Blueprint $table) {
             $table->id();
-            $table->integer('category_id')->nullable()->comment('分类编号：关联 category.id');
+			$table->bigInteger('user_id')->nullable()->comment('创建人id：关联 user.id');
+			$table->bigInteger('category_id')->nullable()->comment('分类编号：关联 category.id');
 			$table->string('key')->nullable()->comment('唯一值');
 			$table->string('name')->default('')->comment('名称');
 			$table->string('description')->default('')->comment('描述');

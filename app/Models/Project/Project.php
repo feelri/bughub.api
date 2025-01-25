@@ -6,6 +6,7 @@ use App\Models\Model;
 use App\Models\User\User;
 use App\Traits\Model\ModelTrait;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
@@ -19,5 +20,13 @@ class Project extends Model
 	public function user(): BelongsTo
 	{
 		return $this->belongsTo(User::class);
+	}
+
+	/**
+	 * @return HasOne
+	 */
+	public function setting(): HasOne
+	{
+		return $this->hasOne(ProjectSetting::class);
 	}
 }

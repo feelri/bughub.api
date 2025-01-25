@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\Dictionary\DictionaryItem;
 use Illuminate\Console\Command;
 
 class TestCommand extends Command
@@ -25,7 +26,6 @@ class TestCommand extends Command
      */
     public function handle(): void
     {
-		throw new \Exception(123123);
 		$this->info('Hello, Feelri');
     }
 }

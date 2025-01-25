@@ -3,10 +3,13 @@
 namespace App\Http\UserApi\Controllers;
 
 use App\Models\Bug\Bug;
+use App\Models\Dictionary\Dictionary;
 use App\Models\Project\Project;
+use App\Models\Project\ProjectSetting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
@@ -38,11 +41,20 @@ class ProjectController extends Controller
 	 */
 	public function store(Request $request): JsonResponse
 	{
-		$params = $request->only([]);
+		$params = $request->only(['setting']);
 		$user   = $request->user();
 
 		$params['user_id'] = $user->id;
-		$project = Project::query()->create(array_filter($params));
+
+		$project = DB::transaction(function () use ($user, $params) {
+			$setting = $params['setting'];
+			unset($params['setting']);
+			$project = Project::query()->create(array_filter($params));
+
+			// 项目配置
+			$project->setting()->create(array_filter($setting));
+			return $project;
+		});
 
 		return $this->response(['id'=>$project->id]);
 	}
@@ -55,6 +67,7 @@ class ProjectController extends Controller
 	 */
 	public function show(Project $project): JsonResponse
 	{
+		$project->load(['setting.bug_status_dictionary.items']);
 		return $this->response($project);
 	}
 
@@ -67,8 +80,16 @@ class ProjectController extends Controller
 	 */
 	public function update(Request $request, Project $project): JsonResponse
 	{
-		$params = $request->only([]);
-		$project->fill($params)->save();
+		$params = $request->only(['setting']);
+
+		$project->load(['setting']);
+		DB::transaction(function () use ($project, $params) {
+			$setting = $params['setting'];
+			unset($params['setting']);
+			$project->fill($params);
+			$project->setting->fill($setting);
+			$project->push();
+		});
 		return $this->success();
 	}
 
