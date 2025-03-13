@@ -46,5 +46,11 @@ class DatabaseSeeder extends Seeder
 		if (!empty($sql)) {
 			DB::unprepared($sql);
 		}
+
+		// 字典
+		$sql = file_get_contents(database_path('dictionary.sql'));
+		if (!empty($sql)) {
+			DB::unprepared($sql);
+		}
 	}
 }
